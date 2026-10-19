@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.iie.poe</groupId>
-    <artifactId>prog5121-poe-part1</artifactId>
+    <artifactId>prog5121-poe-part2</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
@@ -23,10 +23,17 @@
             <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Used by Message.storeMessage() to persist messages as JSON (see README for reference). -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20240303</version>
+        </dependency>
     </dependencies>
 
     <build>
-        <finalName>prog5121-poe-part1</finalName>
+        <finalName>prog5121-poe-part2</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

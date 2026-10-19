@@ -5,87 +5,73 @@ import java.util.Scanner;
 /**
  * Main.java
  *
- * Console-only entry point for Part 1 of the PoE (Registration and Login feature).
+ * Console-only entry point for Part 2 of the PoE (QuickChat message feature).
  * No GUI / JOptionPane is used, as required by the brief.
  */
 public class Main {
 
     private static final Scanner SCANNER = new Scanner(System.in);
-    private static final Login LOGIN = new Login();
 
     public static void main(String[] args) {
         System.out.println("=================================================");
-        System.out.println(" Welcome to the Chat App - Registration & Login ");
+        System.out.println("          Welcome to QuickChat - Part 2         ");
         System.out.println("=================================================");
 
-        boolean running = true;
-        while (running) {
-            printMenu();
-            String choice = SCANNER.nextLine().trim();
+        int numMessages = readNumberOfMessages();
 
-            switch (choice) {
-                case "1":
-                    registerMenu();
-                    break;
-                case "2":
-                    loginMenu();
-                    break;
-                case "3":
-                    running = false;
-                    System.out.println("Goodbye!");
-                    break;
-                default:
-                    System.out.println("Invalid option, please choose 1, 2 or 3.\n");
-            }
+        for (int i = 0; i < numMessages; i++) {
+            System.out.println("\n--- Message " + (i + 1) + " of " + numMessages + " ---");
+            captureAndProcessMessage(i);
         }
+
+        System.out.println("\n--- Summary ---");
+        System.out.println("Total number of messages sent: " + Message.returnTotalMessagessent());
+        System.out.println("\nSent messages:");
+        System.out.println(Message.printMessages());
+
         SCANNER.close();
     }
 
-    private static void printMenu() {
-        System.out.println("\nPlease choose an option:");
-        System.out.println("1. Register");
-        System.out.println("2. Login");
-        System.out.println("3. Exit");
-        System.out.print("> ");
+    private static int readNumberOfMessages() {
+        int num = -1;
+        while (num < 0) {
+            System.out.print("How many messages would you like to capture? ");
+            String input = SCANNER.nextLine().trim();
+            try {
+                num = Integer.parseInt(input);
+                if (num < 0) {
+                    System.out.println("Please enter a positive number.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid whole number.");
+            }
+        }
+        return num;
     }
 
-    private static void registerMenu() {
-        System.out.println("\n--- Registration ---");
+    private static void captureAndProcessMessage(int messageNumber) {
+        System.out.print("Enter the recipient cell number (e.g. +27718693002): ");
+        String recipient = SCANNER.nextLine().trim();
 
-        System.out.print("Enter a first name: ");
-        String firstName = SCANNER.nextLine().trim();
+        System.out.print("Enter the message (max 250 characters): ");
+        String text = SCANNER.nextLine();
 
-        System.out.print("Enter a last name: ");
-        String lastName = SCANNER.nextLine().trim();
+        Message message = new Message(recipient, text, messageNumber);
 
-        System.out.print("Enter a username (must contain an underscore, max 5 characters): ");
-        String username = SCANNER.nextLine().trim();
+        String cellResult = message.checkRecipientCell();
+        System.out.println(cellResult);
 
-        System.out.print("Enter a password (min 8 characters, a capital letter, a number, a special character): ");
-        String password = SCANNER.nextLine().trim();
+        String lengthResult = message.checkMessageLength();
+        System.out.println(lengthResult);
 
-        System.out.print("Enter a South African cell phone number (e.g. +27838968976): ");
-        String cellPhoneNumber = SCANNER.nextLine().trim();
-
-        String result = LOGIN.registerUser(username, password, cellPhoneNumber, firstName, lastName);
-        System.out.println("\n" + result);
-    }
-
-    private static void loginMenu() {
-        System.out.println("\n--- Login ---");
-
-        if (!LOGIN.isUserRegistered()) {
-            System.out.println("No user has been registered yet. Please register first.");
+        if (!message.checkMessageID()) {
+            System.out.println("Message ID generation failed - ID too long.");
             return;
         }
+        System.out.println(message.getMessageIdGeneratedText());
+        System.out.println("Message Hash: " + message.createMessageHash());
 
-        System.out.print("Enter your username: ");
-        String username = SCANNER.nextLine().trim();
-
-        System.out.print("Enter your password: ");
-        String password = SCANNER.nextLine().trim();
-
-        LOGIN.loginUser(username, password);
-        System.out.println("\n" + LOGIN.returnLoginStatus());
+        String outcome = message.sentMessage();
+        System.out.println(outcome);
     }
 }
